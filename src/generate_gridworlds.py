@@ -47,17 +47,19 @@ def generate_multiple_gridworlds(num_environments):
     return gridworlds
 
 def save_gridworlds(gridworlds, filename="gridworlds.npy", txt_directory="grids_txt"):
-    # save the gridworlds to a .npy file
+    """Saves gridworlds as .npy and properly formatted text files with spaces."""
     np.save(filename, gridworlds)
-    
-    # create the directory for text files if it doesn't exist
+
     if not os.path.exists(txt_directory):
         os.makedirs(txt_directory)
-    
-    # save each gridworld as a text file
+
     for i, grid in enumerate(gridworlds):
         txt_filename = f"{txt_directory}/gridworld_{i + 1}.txt"
-        np.savetxt(txt_filename, grid, fmt="%d", delimiter="")
+
+        # ✅ Save with spaces between numbers
+        with open(txt_filename, "w") as f:
+            for row in grid:
+                f.write(" ".join(map(str, row)) + "\n")  # Join numbers with spaces
 
 def load_gridworlds(filename="gridworlds.npy"):
     return np.load(filename, allow_pickle=True)
@@ -75,14 +77,18 @@ def save_gridworld_images(gridworlds, directory="grids"):
         plt.savefig(f"{directory}/gridworld_{i + 1}.png")  # save as PNG
         plt.close()  # close the figure to free memory
 
-# generate 50 gridworlds
-gridworlds = generate_multiple_gridworlds(NUM_ENVIRONMENTS)
+def load_grid_from_txt(filename):
+    """Loads a gridworld from a text file."""
+    return np.loadtxt(filename, dtype=int)  # Read file into NumPy array
 
-# save the gridworlds to a file and their text representations
-save_gridworlds(gridworlds)
+# # generate 50 gridworlds
+# gridworlds = generate_multiple_gridworlds(NUM_ENVIRONMENTS)
 
-# load the gridworlds from the file
-loaded_gridworlds = load_gridworlds()
+# # save the gridworlds to a file and their text representations
+# save_gridworlds(gridworlds)
 
-# save all 50 gridworlds as images in the 'grids' directory
-save_gridworld_images(loaded_gridworlds)
+# # load the gridworlds from the file
+# loaded_gridworlds = load_gridworlds()
+
+# # save all 50 gridworlds as images in the 'grids' directory
+# save_gridworld_images(loaded_gridworlds)

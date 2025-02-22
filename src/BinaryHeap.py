@@ -53,17 +53,17 @@ class MinBinaryHeap(object):
         return
     
     
-heap = MinBinaryHeap()
-heap.insert(10)
-heap.insert(5)
-heap.insert(15)
-heap.insert(3)
-heap.insert(8)
+# heap = MinBinaryHeap()
+# heap.insert(10)
+# heap.insert(5)
+# heap.insert(15)
+# heap.insert(3)
+# heap.insert(8)
 
-print(heap.heap)  # Expected: [3, 5, 15, 10, 8] or similar valid min-heap structure
+# print(heap.heap)  # Expected: [3, 5, 15, 10, 8] or similar valid min-heap structure
 
-print(heap.pop())  # Expected: 3
-print(heap.heap)  # Expected: [5, 8, 15, 10]
+# print(heap.pop())  # Expected: 3
+# print(heap.heap)  # Expected: [5, 8, 15, 10]
 
-print(heap.pop())  # Expected: 5
-print(heap.heap)  # Expected: [8, 10, 15]
+# print(heap.pop())  # Expected: 5
+# print(heap.heap)  # Expected: [8, 10, 15]

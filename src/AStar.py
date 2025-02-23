@@ -38,7 +38,20 @@ def compute_path(grid, open_list, closed_set, cells, goal, track_explored):
 
 def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
     """Initializes A* search and iteratively calls compute_path()."""
+    
+    if grid[start[0]][start[1]] == 1:  #if blocked off of start
+        print("Start cell is blocked!")
+        start = find_nearest_unblocked(grid, start)
+        if not start:
+            print("No unblocked start position found.")
+            return None  
+        else:
+            print(f"Nearest unblocked start position found at {start}")
 
+    if grid[goal[0]][goal[1]] == 1:
+        print("Goal cell is blocked!")
+        return None 
+        
     # Configure tie-breaking strategy
     Cell.prefer_larger_g = prefer_larger_g  
 

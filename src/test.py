@@ -9,7 +9,7 @@ def test_astar():
     goal = (97, 97)
 
     print("Running A* search...")
-    path = main(grid, start, goal, larger_g=False)
+    path = main(grid, start, goal, prefer_larger_g=False)
 
     if path:
         print("Path found:", path)

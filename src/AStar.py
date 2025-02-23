@@ -1,5 +1,6 @@
 from BinaryHeap import MinBinaryHeap
 from Cell import Cell
+from collections import deque
 
 def compute_path(grid, open_list, closed_set, cells, goal, track_explored):
     """Expands one node in the A* search process and returns the goal cell if reached."""
@@ -35,6 +36,33 @@ def compute_path(grid, open_list, closed_set, cells, goal, track_explored):
             open_list.insert(neighbor)
 
     return None  # Goal not reached yet
+
+def find_nearest_unblocked(grid, start):
+    """Find the nearest unblocked cell starting from the given position."""
+    
+    if grid[start[0]][start[1]] == 0:
+        return start  
+
+    #directions
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    queue = deque([start])
+    visited = set()
+    visited.add(start)
+
+    while queue:
+        x, y = queue.popleft()
+
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+
+            if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and (nx, ny) not in visited:
+                if grid[nx][ny] == 0:  #unblocked celll
+                    return (nx, ny)
+
+                queue.append((nx, ny))
+                visited.add((nx, ny))
+
+    return None  #no unblocked cell found
 
 def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
     """Initializes A* search and iteratively calls compute_path()."""

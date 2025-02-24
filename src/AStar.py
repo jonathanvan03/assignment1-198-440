@@ -82,6 +82,12 @@ def move_agent(grid, path, start, goal):
 
 def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
     """Repeated A*: Plans a path, moves the agent, and replans when blocked cells are encountered."""
+    
+    # Check if start and goal are the same
+    if start == goal:
+        print("Start and goal are the same. No movement needed.")
+        return [start], 0, 0  # Return the path containing only the start/goal cell, 0 expanded cells, 0 runtime
+    
     if grid[start[0]][start[1]] == 1:  # If start cell is blocked
         print("Start cell is blocked!")
         start = find_nearest_unblocked(grid, start)

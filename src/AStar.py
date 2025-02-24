@@ -121,9 +121,7 @@ def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
         closed_set = set()
 
         # Perform A* search
-        goal_cell, expanded_cells = None, 0
-        while goal_cell is None:
-            goal_cell, expanded_cells = compute_path(grid, open_list, closed_set, cells, goal, track_explored)
+        goal_cell, expanded_cells = compute_path(grid, open_list, closed_set, cells, goal, track_explored)
 
         total_expanded_cells += expanded_cells  # Accumulate expanded cells
 
@@ -143,7 +141,7 @@ def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
             return path, total_expanded_cells, time.time() - start_time  # Path found
 
     return None, total_expanded_cells, time.time() - start_time  # No path found
-
+  
 def manhattan_distance(a, b):
     """Compute Manhattan distance between two points."""
     return abs(a[0] - b[0]) + abs(a[1] - b[1])

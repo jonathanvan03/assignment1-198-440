@@ -99,15 +99,19 @@ def main(grid, start, goal, prefer_larger_g=False, track_explored=None):
 
     if grid[goal[0]][goal[1]] == 1:  # If goal cell is blocked
         print("Goal cell is blocked!")
+        goal = find_nearest_unblocked(grid, goal)
+        if not goal: 
+            return None, 0, 0
+        else:
+            print(f"Nearest  unblocked end cell is at{goal}")
         return None, 0, 0  # No path found, 0 expanded cells, 0 runtime
 
     # Configure tie-breaking strategy
-    Cell.larger_g = prefer_larger_g
 
     # Initialize all cells before search starts
     rows, cols = len(grid), len(grid[0])
     cells = {
-        (x, y): Cell(x, y, float("inf"), manhattan_distance((x, y), goal))
+        (x, y): Cell(x, y, float("inf"), manhattan_distance((x, y), goal), prefer_larger_g)
         for x in range(rows) for y in range(cols)
     }
 

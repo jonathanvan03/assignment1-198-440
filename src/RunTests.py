@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time
 from AStarRevised import AStar_main  # Ensure AStar_main is correctly imported
 from generate_gridworlds import load_grid_from_txt  # Function to load individual grids
+from AStar import main
 
 # Number of grids
 num_grids = 50
@@ -33,11 +34,15 @@ for i in range(1, num_grids + 1):
 
     # Run A* with larger-g tie-breaking
     path_larger_g, expandedl, runtime_larger_g = AStar_main(grid, start, goal, True)
+    # path_larger_g, expandedl, runtime_larger_g = main(grid, start, goal, True)
+
     larger_g_runtimes.append(runtime_larger_g)
     larger_g_expanded.append(expandedl)
 
     # Run A* with smaller-g tie-breaking
     path_smaller_g, expandeds, runtime_smaller_g = AStar_main(grid, start, goal, False)
+    # path_smaller_g, expandeds, runtime_smaller_g = main(grid, start, goal, False)
+
     smaller_g_runtimes.append(runtime_smaller_g)
     smaller_g_expanded.append(expandeds)
 

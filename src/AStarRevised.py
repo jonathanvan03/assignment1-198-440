@@ -107,7 +107,7 @@ def AStar_main(grid, start, end, larger_g = True, track_explored = None):
     # initialize all unblocked cells before search starts
     rows, cols = len(grid), len(grid[0])
     cells = {
-        (x, y): Cell(x, y, float('inf'), manhattan_distance((x, y), end))
+        (x, y): Cell(x, y, float('inf'), manhattan_distance((x, y), end), larger_g)
         for x in range(rows) for y in range(cols) if grid[x][y] == 0
     }
    

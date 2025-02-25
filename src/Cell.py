@@ -1,7 +1,6 @@
 class Cell:
-    larger_g = False  # Class-level variable for tie-breaking strategy
 
-    def __init__(self, x, y, g, h, parent=None):
+    def __init__(self, x, y, g, h, larger_g = True, parent=None):
         """
         Initialize a cell.
         :param x: x-coordinate of the cell
@@ -16,6 +15,7 @@ class Cell:
         self.h = h  # Heuristic (Manhattan distance to goal)
         self.f = g + h  # Total cost (f = g + h)
         self.parent = parent  # Pointer to the parent cell
+        self.larger_g = larger_g
 
     def __lt__(self, other):
         """
@@ -25,7 +25,7 @@ class Cell:
         """
         if self.f == other.f:
             # Tie-breaking: prefer larger g-values if larger_g is True, else prefer smaller g-values
-            return self.g > other.g if Cell.larger_g else self.g < other.g
+            return self.g > other.g if self.larger_g else self.g < other.g
         # Default: prefer smaller f-values
         return self.f < other.f
 

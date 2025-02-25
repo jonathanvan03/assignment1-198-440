@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from AStarRevised import AStar_main
 from AStar import main
 import generate_gridworlds
 
@@ -30,12 +31,16 @@ def visualize_astar(grid, start, goal, larger_g=False): # change to true/false
 
     # Define function to track explored cells
     def track_explored(cell):
-        color_grid[cell.x, cell.y] = 2  # Mark as explored (blue)
-        update_search()  # Update visualization after each step
+        if grid[cell.x][cell.y] == 0: 
+            color_grid[cell.x, cell.y] = 2  
+            update_search()
 
     # Run A* and collect explored nodes
-    path, expanded_cells, runtime = main(grid, start, goal, larger_g, track_explored=track_explored)
-
+    # path, expanded_cells, runtime = main(grid, start, goal, larger_g, track_explored=track_explored)
+    path, expanded_cells, runtime = AStar_main(grid, start, goal, larger_g, track_explored=track_explored)
+    print(path)
+    print(expanded_cells)
+    print(runtime)
     # Check if a path was found
     if path is None:
         print("No path found! The goal is blocked or unreachable.")
@@ -53,9 +58,9 @@ def visualize_astar(grid, start, goal, larger_g=False): # change to true/false
 # Generate a sample grid
 grid = generate_gridworlds.load_grid_from_txt("grids_txt/gridworld_1.txt")
     
-start = (1, 8)
-goal = (1, 12)
+start = (0, 5)
+goal = (100, 100)
 # print(grid)
 
 # Run visualization
-visualize_astar(grid, start, goal)
+visualize_astar(grid, start, goal, False)

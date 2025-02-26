@@ -78,36 +78,30 @@ def compute_path(open_list, closed_list, cells, end_cell, track_explored, counte
                     
     return expanded
 
-def AStar_main(grid, start, end, larger_g = True, track_explored = None):
-    # if the start and end are the same point
-    if start[0] == end[0] and start[1] == end[1]: 
+def AStar_main(grid, start, end, larger_g=True, track_explored=None):
+    if start == end:
         print("Start and goal are the same. Shortest path = 0.")
         return [start], 0, 0
     
-    # if starting cell is initially blocked
+    # If start is blocked, find nearest unblocked cell
     if grid[start[0]][start[1]] == 1: 
         print("Start cell is blocked, searching for nearest unblocked cell.")
         start = find_nearest_unblocked(grid, start)
-
         if not start: 
             print("No unblocked cell found.") 
             return None, 0, 0
-        else: 
-            print(f"Nearest unblocked cell found at {start}")
-        
+        print(f"Nearest unblocked cell found at {start}")
 
-    # if end cell is initially blocked
+    # If end is blocked, find nearest unblocked cell
     if grid[end[0]][end[1]] == 1: 
         print("End cell is blocked, searching for nearest unblocked cell.")
         end = find_nearest_unblocked(grid, end)
-
         if not end: 
             print("No unblocked cell found.") 
             return None, 0, 0
-        else: 
-            print(f"Nearest unblocked cell found at {end}")
+        print(f"Nearest unblocked cell found at {end}")
             
-    # initialize all unblocked cells before search starts
+    # Initialize unblocked cells
     rows, cols = len(grid), len(grid[0])
     cells = {
         (x, y): Cell(x, y, None, manhattan_distance((x, y), end), larger_g)
@@ -116,18 +110,21 @@ def AStar_main(grid, start, end, larger_g = True, track_explored = None):
     
     counter = 0
     expanded = 0
-    path = 0
+    path = None
     start_cell = cells[start]
     end_cell = cells[end]
     end_cell.g = float('inf')
     start_time = time.time()
+
     while end_cell.g == float('inf'):
         counter += 1
         
+        # Reset search counter
         start_cell.search = counter
         end_cell.g = float('inf')
         end_cell.search = counter
         
+        # Initialize open and closed lists
         open_list = MinBinaryHeap()
         closed_list = set()
         
@@ -139,15 +136,25 @@ def AStar_main(grid, start, end, larger_g = True, track_explored = None):
             return None, expanded, time.time() - start_time
         
         expanded = compute_path(open_list, closed_list, cells, end_cell, track_explored, counter, expanded)
-        
+            
         if end_cell.g == float('inf'):
             print("Cannot reach target cell")
             return None, expanded, time.time() - start_time
         
+        # **Move the agent forward using the updated heuristic**
+        next_cell = end_cell
+        while next_cell.parent is not None and next_cell != start_cell:
+            if next_cell.parent == start_cell:
+                break
+            next_cell = next_cell.parent
+
+        # **If the new cell is in open_list, continue search**
+        if open_list.contains(next_cell) or (next_cell.x, next_cell.y) in closed_list:
+            start_cell = next_cell  # Move the agent forward
+        else:
+            break  # Stop if no valid path exists
+    
     path = reconstruct_path(end_cell)
     
-        
-    
-    
-        
     return path, expanded, time.time() - start_time
+

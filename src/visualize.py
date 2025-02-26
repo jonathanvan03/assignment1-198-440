@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-from AStarRevised import AStar_main
+from NewAStar import AStar_main
 from AStar import main
 import generate_gridworlds
 
@@ -27,7 +27,8 @@ def visualize_astar(grid, start, goal, larger_g=False): # change to true/false
         """Updates the visualization of the grid dynamically."""
         ax.clear()
         ax.imshow(color_grid, cmap=plt.cm.colors.ListedColormap([cmap[i] for i in cmap]), interpolation="none")
-        plt.pause(0.000001)  # Small delay for animation effect
+        # plt.pause(0.000001)  # Small delay for animation effect
+        plt.pause(0.0000001)  # Small delay for animation effect
 
     # Define function to track explored cells
     def track_explored(cell):
@@ -58,7 +59,7 @@ def visualize_astar(grid, start, goal, larger_g=False): # change to true/false
 # Generate a sample grid
 grid = generate_gridworlds.load_grid_from_txt("grids_txt/gridworld_1.txt")
     
-start = (0, 5)
+start = (0 , 5)
 goal = (100, 100)
 # print(grid)
 

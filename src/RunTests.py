@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from AStarRevised import AStar_main  # Ensure AStar_main is correctly imported
+from NewAStar import AStar_main  # Ensure AStar_main is correctly imported
 from generate_gridworlds import load_grid_from_txt  # Function to load individual grids
 from AStar import main
 

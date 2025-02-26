@@ -54,5 +54,5 @@ class Cell:
 
         self.g = new_g
         self.f = self.g + self.h  # Update f-value
-        if new_parent:
+        if new_parent is not None:
             self.parent = new_parent  # Update parent

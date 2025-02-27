@@ -1,67 +1,39 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import time
-from NewAStar import AStar_main
-from AStar import main
-import generate_gridworlds
+import matplotlib.pyplot as plt
+from GenerateGridWorlds import load_grid_from_txt
+from ForwardRepeatedAStar import repeatedForwardMain
 
-def visualize_astar(grid, start, goal, larger_g=False): # change to true/false
-    """Visualize the A* search process in real-time."""
+def plot_shortest_path(grid_path, shortest_path):
+    """Function to visualize the grid and color the shortest path states differently"""
+    grid = load_grid_from_txt(grid_path)
+    grid = np.array(grid)
 
-    fig, ax = plt.subplots()
-    rows, cols = len(grid), len(grid[0])
+    # Create a color map where:
+    # 0 (unblocked) -> white
+    # 1 (blocked) -> black
+    # Path -> colored (light blue)
+    cmap = plt.cm.binary
+    norm = plt.Normalize(vmin=0, vmax=2)
 
-    # Define color mapping
-    cmap = {
-        0: "white",  # Unblocked
-        1: "black",  # Blocked
-        2: "blue",   # Explored cells
-        3: "red"     # Final path
-    }
+    # Convert path states to a different value (e.g., 2) for coloring
+    for r, c in shortest_path:
+        grid[r][c] = 2  # Assign a new value for path visualization
 
-    # Convert grid to color format
-    color_grid = np.array(grid, dtype=int)
+    plt.figure(figsize=(8, 8))
+    plt.imshow(grid, cmap=cmap, norm=norm, origin='upper')
 
-    # Function to update the visualization
-    def update_search():
-        """Updates the visualization of the grid dynamically."""
-        ax.clear()
-        ax.imshow(color_grid, cmap=plt.cm.colors.ListedColormap([cmap[i] for i in cmap]), interpolation="none")
-        # plt.pause(0.000001)  # Small delay for animation effect
-        plt.pause(0.0000001)  # Small delay for animation effect
+    # Mark the start and goal points
+    plt.text(shortest_path[0][1], shortest_path[0][0], 'S', fontsize=12, color='green', ha='center', va='center', fontweight='bold')
+    plt.text(shortest_path[-1][1], shortest_path[-1][0], 'G', fontsize=12, color='blue', ha='center', va='center', fontweight='bold')
 
-    # Define function to track explored cells
-    def track_explored(cell):
-        if grid[cell.x][cell.y] == 0: 
-            color_grid[cell.x, cell.y] = 2  
-            update_search()
-
-    # Run A* and collect explored nodes
-    # path, expanded_cells, runtime = main(grid, start, goal, larger_g, track_explored=track_explored)
-    path, expanded_cells, runtime = AStar_main(grid, start, goal, larger_g, track_explored=track_explored)
-    print(path)
-    print(expanded_cells)
-    print(runtime)
-    # Check if a path was found
-    if path is None:
-        print("No path found! The goal is blocked or unreachable.")
-        update_search() 
-        plt.show()
-        return
-
-    # Draw final path in red
-    for (x, y) in path:
-        color_grid[x, y] = 3  # Mark final path as red
-        update_search()  # Update visualization
-
+    plt.title("Shortest Path Visualization")
+    plt.xticks([])
+    plt.yticks([])
     plt.show()
 
-# Generate a sample grid
-grid = generate_gridworlds.load_grid_from_txt("grids_txt/gridworld_1.txt")
-    
-start = (0 , 5)
-goal = (100, 100)
-# print(grid)
-
-# Run visualization
-visualize_astar(grid, start, goal, False)
+# Example usage
+grid_path = "grids_txt/gridworld_1.txt"
+start, goal = (0, 5), (100, 100)
+shortest_path, expanded, time = repeatedForwardMain(grid_path, start, goal, False)
+plot_shortest_path(grid_path, shortest_path)
+print(shortest_path)

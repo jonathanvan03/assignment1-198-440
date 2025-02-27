@@ -65,4 +65,4 @@ goal = (100, 100)
 # print(grid)
 
 # Run visualization
-visualize_astar(grid, path , start, goal, False)
+visualize_astar(grid, path , start, goal, True)

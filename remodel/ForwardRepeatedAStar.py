@@ -14,8 +14,8 @@ def computePath(open_list, closed_list, goal, expanded, counter, states, track_e
             
         for action in determineActions(current, states, closed_list):
             successor = successorState(current, action, states)
-            if successor.isBlocked:
-                continue
+            # if successor.isBlocked:
+            #     continue
             
             if successor.search < counter:
                 successor.g = float('inf')

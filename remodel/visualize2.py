@@ -56,7 +56,7 @@ def visualize_astar(grid, path, start, goal, larger_g=False): # change to true/f
     plt.show()
 
 # Generate a sample grid
-path = "grids_txt/gridworld_4.txt"
+path = "grids_txt/gridworld_1.txt"
 grid = GenerateGridWorlds.load_grid_from_txt(path)
 
   

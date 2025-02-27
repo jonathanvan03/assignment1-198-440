@@ -9,8 +9,8 @@ def computePath(open_list, closed_list, goal, expanded, counter, states, track_e
         current = open_list.pop() # pop the min f valued state from the heap
         closed_list.add(current) # add the current state to the closed state since it is going to be expanded
         expanded.append((current.x, current.y)) 
-        if track_explored:
-            track_explored(current)
+        # if track_explored:
+        #     track_explored(current)
             
         for action in determineActions(current, states, closed_list):
             successor = successorState(current, action, states)
@@ -102,6 +102,8 @@ def repeatedForwardMain(grid_path, start, goal, larger_g = True, track_explored 
             if current.isObserved is False:
                 start_state = current
                 path.append(np.array((current.x, current.y)))
+                if track_explored:
+                    track_explored(current)
                 checkAdjacent(current, states)
             else: 
                 break

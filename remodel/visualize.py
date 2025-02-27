@@ -33,7 +33,7 @@ def plot_shortest_path(grid_path, shortest_path):
 
 # Example usage
 grid_path = "grids_txt/gridworld_1.txt"
-start, goal = (0, 0), (100, 100)
-shortest_path, expanded, time = repeatedForwardMain(grid_path, start, goal, True)
+start, goal = (0, 5), (100, 100)
+shortest_path, expanded, time = repeatedForwardMain(grid_path, start, goal, False)
 plot_shortest_path(grid_path, shortest_path)
 print(shortest_path)

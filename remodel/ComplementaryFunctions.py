@@ -2,12 +2,14 @@ from State import State
 import numpy as np
 from GenerateGridWorlds  import load_grid_from_txt
 from collections import deque
+import numpy as np
 
-def generateStates(path, larger_g = True):
+def generateStates(path):
     """function to load grid from text and initialize all states"""
     grid = load_grid_from_txt(path)
-    state = [[State(x, y, True if grid[x][y] == 1 else False, larger_g) for x in range(len(grid))] for y in range(len(grid[0]))]
-    return state
+    return [[State(x, y, True if int(grid[x][y]) == 1 else False) for y in range(len(grid[0]))] for x in range(len(grid))]
+
+
 
 def manhattanDistance(a, b):
     """function to calculate the manhattan distance from state a to state b (heuristic function for this a* implementation)"""
@@ -24,19 +26,19 @@ def determineActions(state, states, closed_list):
     c = state.y
     
     if c - 1 >= 0: # state to the left of the current
-        if (states[r][c - 1].isObserved == False) and (states[r][c - 1] not in closed_list):
+        if (states[r][c - 1].isObserved is False) and (states[r][c - 1] not in closed_list):
             actions.append('l')
             
     if r - 1 >= 0: # state above the curent    
-        if (states[r - 1][c].isObserved == False) and (states[r - 1][c] not in closed_list):
+        if (states[r - 1][c].isObserved is False) and (states[r - 1][c] not in closed_list):
             actions.append('u')
             
     if c + 1 <= len(states[0]) - 1: # state to the right of current
-        if (states[r][c + 1].isObserved == False) and (states[r][c + 1] not in closed_list):
+        if (states[r][c + 1].isObserved is False) and (states[r][c + 1] not in closed_list):
             actions.append('r')
             
     if r + 1 <= len(states) - 1: # state below the current 
-        if (states[r + 1][c].isObserved == False) and (states[r + 1][c] not in closed_list):
+        if (states[r + 1][c].isObserved is False) and (states[r + 1][c] not in closed_list):
             actions.append('d')
             
     
@@ -102,14 +104,12 @@ def find_nearest_unblocked(coord, states):
     return None # No unblocked cell found
 
 def reconstruct_path(path):
-
-    # Remove redundant loops from the path
     i = 0
     while i < len(path) - 1:
         location = path[i]
         hasDuplicate = False
         for j in range(i + 1, len(path)):
-            if location == path[j]:
+            if all(location == path[j]):
                 hasDuplicate = True
                 del path[i + 1 : j + 1]
                 break

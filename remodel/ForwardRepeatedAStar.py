@@ -2,16 +2,20 @@ from MinBinaryHeap import MinBinaryHeap
 import time
 from ComplementaryFunctions import generateStates, manhattanDistance, determineActions, successorState, checkAdjacent, find_nearest_unblocked, reconstruct_path
 from State import State
+import numpy as np
 
-def computePath(open_list, closed_list, goal, expanded, counter, states):
+def computePath(open_list, closed_list, goal, expanded, counter, states, track_explored):
     while goal.g > open_list.peek().f:
         current = open_list.pop() # pop the min f valued state from the heap
         closed_list.add(current) # add the current state to the closed state since it is going to be expanded
-        
         expanded.append((current.x, current.y)) 
-        
+        if track_explored:
+            track_explored(current)
+            
         for action in determineActions(current, states, closed_list):
             successor = successorState(current, action, states)
+            if successor.isBlocked:
+                continue
             
             if successor.search < counter:
                 successor.g = float('inf')
@@ -30,8 +34,8 @@ def computePath(open_list, closed_list, goal, expanded, counter, states):
         if open_list.isEmpty():
             break
         
-def repeatedForwardMain(grid_path, start, goal, larger_g = True):
-    states = generateStates(grid_path, larger_g)
+def repeatedForwardMain(grid_path, start, goal, larger_g = True, track_explored = None):
+    states = generateStates(grid_path)
     
     start_state = states[start[0]][start[1]]
     goal_state = states[goal[0]][goal[1]]
@@ -61,7 +65,7 @@ def repeatedForwardMain(grid_path, start, goal, larger_g = True):
     expanded = []
     
     checkAdjacent(start_state, states)
-    path.append((start_state.x, start_state.y))
+    path.append(np.array((start_state.x, start_state.y)))
     
     for rows in states:
         for state in rows:
@@ -76,16 +80,16 @@ def repeatedForwardMain(grid_path, start, goal, larger_g = True):
         goal_state.g = float('inf')
         goal_state.search = counter
         
-        open_list = MinBinaryHeap()
+        open_list = MinBinaryHeap(larger_g)
         closed_list = set()
         
         start_state.update()
         open_list.insert(start_state)
         
-        computePath(open_list, closed_list, goal_state, expanded, counter, states)
+        computePath(open_list, closed_list, goal_state, expanded, counter, states, track_explored)
         
         if open_list.isEmpty():
-            return path, expanded, time.time() - start_time
+            return None, expanded, time.time() - start_time
                 
         while start_state != goal_state:
             current = goal_state
@@ -97,13 +101,12 @@ def repeatedForwardMain(grid_path, start, goal, larger_g = True):
                 
             if current.isObserved is False:
                 start_state = current
-                path.append((start_state.x, start_state.y))
-                checkAdjacent(start_state, states)
+                path.append(np.array((current.x, current.y)))
+                checkAdjacent(current, states)
             else: 
                 break
             
-    expanded.append((goal_state.x, goal_state.y))
-    print(path)
+    expanded.append(np.array((goal_state.x, goal_state.y)))
     shortest_path = reconstruct_path(path)
     end_time = time.time()
         

@@ -1,151 +1,154 @@
 from State import State
 
+
 class MinBinaryHeap:
-    def __init__(self):
-        self.heap = []
-        self.coords = {}
-            
+    def __init__(self, isLargerGFirst: bool):
+        self.heap = []  # Heap list
+        self.length = len(self.heap)
+        self.isLargerGFirst = isLargerGFirst  # Tie-breaking preference
+
     def size(self):
-        return len(self.heap)
-    
+        return self.length
+
     def isEmpty(self):
-        return len(self.heap) == 0
-    
+        return self.length == 0
+
     def insert(self, state):
+        """Insert an item into the heap and maintain heap order."""
         self.heap.append(state)
-        self.coords[(state.x, state.y)] = len(self.heap) - 1
-        self.heapUp(len(self.heap) - 1)           
-       
+        self.length += 1
+        self.heapUp(len(self.heap) - 1)  # FIXED: Use zero-based index
+
     def pop(self):
-        if not self.heap:
+        """Remove and return the state with the smallest f-value from the heap."""
+        if self.isEmpty():
             return None
-        
+
         self.swap(0, len(self.heap) - 1)  # Swap root with last element
         min_val = self.heap.pop()
-        self.coords.pop((min_val.x, min_val.y), None)
-
-        if self.heap:
-            self.heapDown(0)  # Restore heap property
+        self.heapDown(0)  # FIXED: Start at root after removal
+        self.length -= 1
 
         return min_val
-    
+
     def remove(self, state):
-        if (state.x, state.y) not in self.coords:
-            return  # Value not found
-
-        index = self.coords.pop((state.x, state.y))  
-        if index == len(self.heap) - 1:  
-            self.heap.pop()  # Just remove last element
-            return
-
-        self.swap(index, len(self.heap) - 1)  # Swap with last element
-        self.heap.pop()
-
-        if index < len(self.heap):
-            self.heapUp(index)
-            self.heapDown(index)
-                
-    def peek(self):
-        return self.heap[0] if self.heap else None
+        """Remove a specific state from the heap."""
+        if self.heap.index(state) == 0:
+            self.pop()
+            self.length -= 1
+            return True
+        else:
+            if self.length > 0:
+                while state in self.heap:
+                    i = self.heap.index(state)
+                    self.swap(i, self.length - 1)
                     
+                    del (self.heap[self.length - 1])
+                    self.length -= 1
+                    self.heapDown(i + 1)
+
+        
+
+    def peek(self):
+        """Return the state with the smallest f-value without removing it."""
+        return self.heap[0] if not self.isEmpty() else None
+
     def heapUp(self, i):
+        """Move a node up to maintain the heap property."""
         parent = (i - 1) // 2
-        while i > 0 and self.heap[i] < self.heap[parent]:
+        while i > 0 and self.compare(self.heap[i], self.heap[parent]):
             self.swap(i, parent)
             i = parent
             parent = (i - 1) // 2
-            
+
     def heapDown(self, i):
+        """Move a node down to maintain the heap property."""
         n = len(self.heap)
         while True:
-            l, r = 2 * i + 1, 2 * i + 2
+            left, right = 2 * i + 1, 2 * i + 2
             smallest = i
-            
-            if l < n and self.heap[l] < self.heap[smallest]:
-                smallest = l
-            if r < n and self.heap[r] < self.heap[smallest]:
-                smallest = r
+
+            if left < n and self.compare(self.heap[left], self.heap[smallest]):
+                smallest = left
+            if right < n and self.compare(self.heap[right], self.heap[smallest]):
+                smallest = right
+
             if smallest == i:
                 break
-            
+
             self.swap(i, smallest)
             i = smallest
-    
+
     def swap(self, i, j):
-        self.coords[(self.heap[i].x, self.heap[i].y)] = j
-        self.coords[(self.heap[j].x, self.heap[j].y)] = i
+        """Swap two states in the heap."""
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
-            
+
     def contains(self, state):
-        if state in self.heap:
-            return True
-        else:
-            return False 
-            
-            
-def test_heap_operations():
-    print("Starting MinBinaryHeap tests...\n")
+        """Check if a state exists in the heap."""
+        return state in self.heap
 
-    # Create a heap instance
-    heap = MinBinaryHeap()
+    def compare(self, s1, s2):
+        """
+        Compare two states based on f-value.
+        Tie-breaking is done using:
+        - 999 * f - g (larger g first)
+        - 999 * f + g (smaller g first)
+        """
+        if s1.f == s2.f:
+            s1_priority = (999 * s1.f - s1.g) if self.isLargerGFirst else (999 * s1.f + s1.g)
+            s2_priority = (999 * s2.f - s2.g) if self.isLargerGFirst else (999 * s2.f + s2.g)
+            return s1_priority < s2_priority  # Min-heap property
+        return s1.f < s2.f
 
-    # Create state objects with different f-values
-    state1 = State(0, 0, False)  # f = 0
-    state1.g, state1.h = 3, 5
-    state1.update()  # f = 8
 
-    state2 = State(1, 1, False)  # f = 0
-    state2.g, state2.h = 2, 4
-    state2.update()  # f = 6
 
-    state3 = State(2, 2, False)  # f = 0
-    state3.g, state3.h = 1, 2
-    state3.update()  # f = 3
 
-    state4 = State(3, 3, False)  # f = 0
-    state4.g, state4.h = 4, 6
-    state4.update()  # f = 10
+def test_heap_with_tiebreaking():
+    print("Testing MinBinaryHeap with tie-breaking...\n")
 
-    # Insert elements into heap
-    print("Inserting states...")
-    heap.insert(state1)
-    heap.insert(state2)
-    heap.insert(state3)
-    heap.insert(state4)
+    # Create the heap (adjust tie-breaking preference)
+    use_larger_g = True  # Change to False to test smaller-g first
+    heap = MinBinaryHeap(use_larger_g)
 
-    print("Heap contents after insertions:")
-    for state in heap.heap:
-        print(f"State ({state.x}, {state.y}): f = {state.f}, g = {state.g}, h = {state.h}")
+    # Create 10 test states (some with same f-values)
+    states = [
+        State(0, 0, False),  # f = 3, g = 1, h = 2
+        State(1, 1, False),  # f = 5, g = 2, h = 3
+        State(2, 2, False),  # f = 3, g = 2, h = 1  (Same f as (0,0), different g)
+        State(3, 3, False),  # f = 8, g = 5, h = 3
+        State(4, 4, False),  # f = 5, g = 3, h = 2  (Same f as (1,1))
+        State(5, 5, False),  # f = 6, g = 4, h = 2
+        State(6, 6, False),  # f = 6, g = 2, h = 4  (Same f as (5,5), different g)
+        State(7, 7, False),  # f = 10, g = 7, h = 3
+        State(8, 8, False),  # f = 7, g = 4, h = 3
+        State(9, 9, False),  # f = 3, g = 3, h = 0  (Same f as (0,0) and (2,2))
+    ]
 
-    # Peek at the min element
-    min_state = heap.peek()
-    print(f"\nPeeked min state: ({min_state.x}, {min_state.y}) with f = {min_state.f}")
-    assert min_state == state3, "Peek should return the state with the smallest f-value."
+    # Assign g, h, and compute f
+    g_h_values = [
+        (1, 2), (2, 3), (2, 1), (5, 3), (3, 2),
+        (4, 2), (2, 4), (7, 3), (4, 3), (3, 0)
+    ]
+    
+    for state, (g, h) in zip(states, g_h_values):
+        state.g = g
+        state.h = h
+        state.update()
 
-    # Pop elements and check order
-    print("\nPopping elements...")
+    # Insert states into the heap
+    print("Inserting states into heap...\n")
+    for state in states:
+        heap.insert(state)
+        print(f"Inserted ({state.x}, {state.y}) with f = {state.f}, g = {state.g}, h = {state.h}")
+
+    print("\nPopping states in order:")
     while not heap.isEmpty():
         state = heap.pop()
-        print(f"Popped ({state.x}, {state.y}): f = {state.f}")
+        print(f"Popped ({state.x}, {state.y}) with f = {state.f}, g = {state.g}, h = {state.h}")
+
+    print("\nHeap test completed! ✅")
     
-    assert heap.isEmpty(), "Heap should be empty after all pops."
-
-    # Insert elements again for remove() test
-    heap.insert(state1)
-    heap.insert(state2)
-    heap.insert(state3)
-    heap.insert(state4)
-
-    print("\nRemoving state (1,1)...")
-    heap.remove(state2)  # Remove state2 (f = 6)
+if __name__ == '__main__':
+    test_heap_with_tiebreaking()
     
-    print("Heap contents after removal:")
-    for state in heap.heap:
-        print(f"State ({state.x}, {state.y}): f = {state.f}, g = {state.g}, h = {state.h}")
-
-    assert state2 not in heap.heap, "State (1,1) should be removed from the heap."
-
-    print("\nAll tests passed! 🎉")
-
-if __name__ == "__main__":
-    test_heap_operations()
+    

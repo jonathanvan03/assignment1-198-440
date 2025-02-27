@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 from ForwardRepeatedAStar import repeatedForwardMain
+from BackwardRepeatedAStar import repeatedBackwardMain
+from AdaptiveAStar import repeatedAdaptiveMain
 import GenerateGridWorlds
 
-def visualize_astar(grid, path, start, goal, larger_g=False): # change to true/false
-    """Visualize the A* search process in real-time."""
+def visualize_astar(grid, grid_path, start, goal, larger_g=False):
+    """Visualize A* search process separately for each algorithm."""
 
-    fig, ax = plt.subplots()
     rows, cols = len(grid), len(grid[0])
 
     # Define color mapping
@@ -21,48 +22,54 @@ def visualize_astar(grid, path, start, goal, larger_g=False): # change to true/f
     # Convert grid to color format
     color_grid = np.array(grid, dtype=int)
 
-    # Function to update the visualization
-    def update_search():
-        """Updates the visualization of the grid dynamically."""
-        ax.clear()
-        ax.imshow(color_grid, cmap=plt.cm.colors.ListedColormap([cmap[i] for i in cmap]), interpolation="none")
-        # plt.pause(0.000001)  # Small delay for animation effect
-        plt.pause(0.0000001)  # Small delay for animation effect
+    def run_and_visualize(algorithm, algorithm_name):
+        """Runs A* search and visualizes it separately."""
+        fig, ax = plt.subplots()
+        ax.set_title(algorithm_name)
 
-    # Define function to track explored cells
-    def track_explored(cell):
-        if grid[cell.x][cell.y] == 0: 
-            color_grid[cell.x, cell.y] = 2  
+        def update_search():
+            """Updates the visualization of the grid dynamically."""
+            ax.clear()
+            ax.imshow(color_grid, cmap=plt.cm.binary, interpolation="none")
+            plt.pause(0.0001)  # Small delay for animation effect
+
+        def track_explored(cell):
+            """Marks explored cells during search."""
+            if grid[cell.x][cell.y] == 0:  
+                color_grid[cell.x, cell.y] = 2  # Mark as explored
+                update_search()
+
+        print(f"Running {algorithm_name}...")
+        color_grid[:] = np.array(grid, dtype=int)  # Reset the color grid
+        path, expanded_cells, runtime = algorithm(grid_path, start, goal, larger_g, track_explored=track_explored)
+        
+        print(f"Path: {path}")
+        print(f"Number of expanded cells: {len(expanded_cells)}")
+        print(f"Runtime: {runtime:.5f} seconds")
+
+        if path is None:
+            print(f"No path found using {algorithm_name}! The goal is blocked or unreachable.")
+            update_search()
+            return
+
+        # Draw final path in red
+        for (x, y) in path:
+            color_grid[x, y] = 3  # Mark final path
             update_search()
 
-    # Run A* and collect explored nodes
-    # path, expanded_cells, runtime = main(grid, start, goal, larger_g, track_explored=track_explored)
-    path, expanded_cells, runtime = repeatedForwardMain(path, start, goal, larger_g, track_explored=track_explored)
-    print(path)
-    print(len(expanded_cells))
-    print(runtime)
-    # Check if a path was found
-    if path is None:
-        print("No path found! The goal is blocked or unreachable.")
-        update_search() 
         plt.show()
-        return
 
-    # Draw final path in red
-    for (x, y) in path:
-        color_grid[x, y] = 3  # Mark final path as red
-        update_search()  # Update visualization
+    # Run each A* variant separately
+    run_and_visualize(repeatedForwardMain, "Repeated Forward A*")
+    run_and_visualize(repeatedBackwardMain, "Repeated Backward A*")
+    run_and_visualize(repeatedAdaptiveMain, "Repeated Adaptive A*")
 
-    plt.show()
+# Load grid from file
+grid_path = "grids_txt/gridworld_1.txt"
+grid = GenerateGridWorlds.load_grid_from_txt(grid_path)
 
-# Generate a sample grid
-path = "grids_txt/gridworld_1.txt"
-grid = GenerateGridWorlds.load_grid_from_txt(path)
-
-  
-start = (0 , 0)
+start = (0, 0)
 goal = (100, 100)
-# print(grid)
 
 # Run visualization
-visualize_astar(grid, path , start, goal, True)
+visualize_astar(grid, grid_path, start, goal, False)

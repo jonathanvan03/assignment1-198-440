@@ -4,6 +4,7 @@ from ComplementaryFunctions import generateStates, manhattanDistance, determineA
 from State import State
 import numpy as np
 
+# move from agent current state (start) to target (goal)
 def computePath(open_list, closed_list, goal, expanded, counter, states, track_explored):
     while goal.g > open_list.peek().f:
         current = open_list.pop() # pop the min f valued state from the heap
@@ -69,10 +70,10 @@ def repeatedForwardMain(grid_path, start, goal, larger_g = True, track_explored 
     
     for rows in states:
         for state in rows:
-            state.h = manhattanDistance(state, goal_state)
+            state.h = manhattanDistance(state, goal_state) # distance to target
         
     start_time = time.time()
-    while start_state != goal_state:
+    while start_state != goal_state: # continue until start reaches
         counter += 1
         
         start_state.g = 0
